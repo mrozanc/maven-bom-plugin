@@ -1,35 +1,35 @@
 package fr.rozanc.gradle.plugin.maven.bom.utils
 
-import fr.rozanc.gradle.plugin.maven.bom.model.ModelHierarchy
-import org.apache.maven.model.Model
+import fr.rozanc.gradle.plugin.maven.bom.model.HierarchicalModel
+import fr.rozanc.gradle.plugin.maven.bom.model.ModelWrapper
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import java.io.File
 
 object MavenModelReader {
 
-    fun readProject(projectDirectory: File): Sequence<ModelHierarchy> {
+    fun readProject(projectDirectory: File): Sequence<HierarchicalModel> {
         return readRecursively(projectDirectory)
     }
 
     private fun readRecursively(
         currentDirectory: File,
-        processedModels: MutableMap<String, ModelHierarchy> = mutableMapOf()
-    ): Sequence<ModelHierarchy> = sequence {
-        val model: Model
+        processedModels: MutableMap<String, HierarchicalModel> = mutableMapOf()
+    ): Sequence<HierarchicalModel> = sequence {
+        val model: ModelWrapper
         File(currentDirectory, "pom.xml").inputStream().use {
             val reader = MavenXpp3Reader()
-            model = reader.read(it)
+            model = ModelWrapper(reader.read(it))
         }
 
-        if (model.groupId == null && model.parent.groupId != null) {
-            model.groupId = model.parent.groupId
+        if (model.groupId == null && model.parent?.groupId != null) {
+            model.groupId = model.parent?.groupId
         }
-        if (model.version == null && model.parent.version != null) {
-            model.version = model.parent.version
+        if (model.version == null && model.parent?.version != null) {
+            model.version = model.parent?.version
         }
 
-        val childrenList = mutableListOf<ModelHierarchy>()
-        val node = ModelHierarchy(model, model.parent?.let { processedModels[model.parent.id] }, childrenList)
+        val childrenList = mutableListOf<HierarchicalModel>()
+        val node = HierarchicalModel(model, model.parent?.let { processedModels[it.id] }, childrenList)
         processedModels[model.id] = node
         model.modules.map { module ->
             yieldAll(

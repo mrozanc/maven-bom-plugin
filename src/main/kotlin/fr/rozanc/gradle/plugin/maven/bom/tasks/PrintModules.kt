@@ -1,7 +1,9 @@
 package fr.rozanc.gradle.plugin.maven.bom.tasks
 
-import fr.rozanc.gradle.plugin.maven.bom.model.ModelHierarchy
+import fr.rozanc.gradle.plugin.maven.bom.model.HierarchicalModel
 import fr.rozanc.gradle.plugin.maven.bom.utils.MavenModelReader
+import org.apache.maven.execution.DefaultMavenExecutionRequest
+import org.eclipse.aether.DefaultRepositorySystemSession
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.InputDirectory
@@ -18,23 +20,29 @@ open class PrintModules : DefaultTask() {
 
     @TaskAction
     fun readPom() {
-        MavenModelReader.readProject(inputDirectory.get().asFile)
+        val models = MavenModelReader.readProject(inputDirectory.get().asFile)
             .sortedWith(compareBy(
                 { it.path() },
                 { it.parentModule?.childModules?.indexOf(it) ?: 0 }
             ))
-            .forEach { node ->
-                println(" ".repeat(node.level * 2) + node.model.id)
-            }
+            .toList()
+
+        models.forEach { node ->
+            println(" ".repeat(node.level * 2) + node.model.id)
+        }
+
+        val request = DefaultMavenExecutionRequest()
+        request.pom = models.first().model.pomFile
+        request.projectBuildingRequest.repositorySession = DefaultRepositorySystemSession()
     }
 
-    private fun ModelHierarchy.path(): String {
+    private fun HierarchicalModel.path(): String {
         val sb = StringBuilder(100)
         path(this, sb)
         return sb.toString()
     }
 
-    private fun path(currentModel: ModelHierarchy, pathBuilder: StringBuilder) {
+    private fun path(currentModel: HierarchicalModel, pathBuilder: StringBuilder) {
         if (currentModel.parentModule != null) {
             path(currentModel.parentModule, pathBuilder)
         }

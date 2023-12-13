@@ -27,17 +27,13 @@ gradlePlugin {
 
 dependencies {
     implementation(platform(embeddedKotlin("bom")))
-    implementation("org.apache.maven:maven-model") {
-        version {
-            strictly("3+")
-            prefer("[3.8,4.0)")
-        }
-    }
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.apache.maven.plugins:maven-help-plugin:3.4.0")
+    implementation(libs.bundles.maven)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
 
     testImplementation(gradleTestKit())
-    testImplementation("io.kotest:kotest-assertions-core:5.5.4")
-    testImplementation("io.kotest:kotest-runner-junit5:5.5.4")
+    testImplementation("io.kotest:kotest-assertions-core:5.5.5")
+    testImplementation("io.kotest:kotest-runner-junit5:5.5.5")
     testImplementation(kotlin("test"))
 }
 

@@ -1,0 +1,12 @@
+[versions]
+maven = "3.9.6"
+
+[libraries]
+maven-artifact = { module = "org.apache.maven:maven-artifact", version.ref = "maven" }
+maven-core = { module = "org.apache.maven:maven-core", version.ref = "maven" }
+maven-model = { module = "org.apache.maven:maven-model", version.ref = "maven" }
+maven-plugin-api = { module = "org.apache.maven:maven-plugin-api", version.ref = "maven" }
+maven-settings = { module = "org.apache.maven:maven-settings", version.ref = "maven" }
+
+[bundles]
+maven = ["maven-artifact", "maven-core", "maven-model", "maven-plugin-api", "maven-settings"]

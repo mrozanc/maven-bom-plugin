@@ -5,7 +5,7 @@
   <parent>
     <groupId>fr.rozanc.example</groupId>
     <artifactId>complex-project-aggregator-2</artifactId>
-    <version>1.0.0</version>
+    <version>2.1.1</version>
   </parent>
   <artifactId>complex-project-aggregator-3</artifactId>
   <packaging>pom</packaging>
